@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Data Files
+archive.zip
+sudoku.csv
+Img/
+
+# Junk Files
+.DS_Store
