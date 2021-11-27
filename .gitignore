@@ -135,3 +135,6 @@ Img/
 
 # Junk Files
 .DS_Store
+
+# Try files
+backtrack.py

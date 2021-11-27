@@ -1,57 +1,7 @@
-def solve(board):
-    find = find_empty(board)
-
-    if not find:
-        return True
-    else:
-        row, col = find
-    
-    for i in range(1, 10):
-        if valid(board, i, (row, col)):
-            board[row][col] = i
-
-            if solve(board):
-                return True
-
-            board[row][col] = 0
-    return False
-
-def valid(board, num, pos):
-    for i in range(len(board[0])):
-        if board[pos[0]][i] == num and pos[1] != i:
-            return False
-
-    for i in range(len(board)):
-        if board[i][pos[1]] == num and pos[0] != i:
-            return False
-
-    box_x = pos[1]//3
-    box_y = pos[0]//3
-
-    for i in range(box_y*3, box_y*3+3):
-        for j in range(box_x*3, box_x*3+3):
-            if board[i][j] == num and (i,j) != pos:
-                return False
-    return True
-
-def print_board(board):
-    for i in range(len(board)):
-        if i%3 == 0 and i!=0:
-            print("- - - - - - - - - - - - - ")
-        for j in range(len(board[0])):
-            if j % 3 == 0 and j != 0:
-                print(" | ", end="")
-            if j == 8:
-                print(board[i][j])
-            else:
-                print(str(board[i][j]) + " ", end="")
-
-def find_empty(board):
-    for i in range(len(board)):
-        for j in range(len(board[0])):
-            if not board[i][j]:
-                return (i, j)
-    return None
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+from Solver import Board, Solver
 
 game = '''
           0 0 0 7 0 0 0 9 6
@@ -72,7 +22,35 @@ for i in game:
     t = list(map(int,t))
     board.append(t)
 
-print_board(board)
-solve(board)
-print()
-print_board(board)
+brd = Board(board)
+print(brd)
+
+
+# data = pd.read_csv("sudoku.csv")
+
+# val_set = data.iloc[:1000]
+
+# quiz_list = list(val_set['quizzes'])
+# print(quiz_list[0])
+# sol_list = list(val_set['solutions'])
+# print(sol_list[0])
+# val_quiz = []
+# val_sol = []
+# for i,j in tqdm(zip(quiz_list,sol_list)):
+#     q = np.array(list(map(int,list(i)))).reshape(9,9)
+#     s = np.array(list(map(int,list(j)))).reshape(9,9)
+#     val_quiz.append(q)
+#     val_sol.append(s)
+
+# count = 0
+# for i,j in tqdm(zip(val_quiz,val_sol)):
+#     if solve(i):
+#         if (i==j).all():
+#             count+=1
+#     else:
+#         pass
+    
+# print("{}/1000 solved!! That's {}% accuracy.\n".format(count,(count/1000.0)*100))
+
+
+
