@@ -24,14 +24,14 @@ def four_point_transform(image, pts):
 	# x-coordiates or the top-right and top-left x-coordinates
     widthA = np.sqrt(((bl[0]-br[0])**2 - (bl[1]-br[1])**2))
     widthB = np.sqrt(((tl[0]-tr[0])**2 - (tl[1]-tr[1])**2))
-    maxwidth = max(widthA, widthB)
+    maxwidth = max(int(widthA), int(widthB))
 
     # compute the height of the new image, which will be the
 	# maximum distance between the top-right and bottom-right
 	# y-coordinates or the top-left and bottom-left y-coordinate
-    heightA = np.sqrt(((tl[0]-bl[0])**2 - (tl[1]-bl[1])**2))
-    heightB = np.sqrt(((tr[0]-br[0])**2 - (tr[1]-br[1])**2))
-    maxheight = max(heightA, heightB)
+    heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
+    heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
+    maxheight = max(int(heightA), int(heightB))
     # now that we have the dimensions of the new image, construct
 	# the set of destination points to obtain a "birds eye view",
 	# (i.e. top-down view) of the image, again specifying points
@@ -60,11 +60,13 @@ def grab_contours(contours):
 def find_puzzle(image, debug=True):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (7, 7), 3)
-    thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN, cv2.THRESH_BINARY, 11, 2)
+    thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+    thresh = cv2.bitwise_not(thresh)
 
     if debug:
         cv2.imshow("Puzzle Thresh" ,thresh)
         cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     # find contours in the thresholded image and sort them by size in
 	# descending order
@@ -98,16 +100,18 @@ def find_puzzle(image, debug=True):
         cv2.drawContours(output, [puzzlecnt], -1, (0, 255, 0), 2)
         cv2.imshow("Puzzle Outline", output)
         cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     # apply a four point perspective transform to both the original
     # image and grayscale image to obtain a top-down bird's eye view
 	# of the puzzle
-	puzzle = four_point_transform(image, puzzlecnt.reshape(4, 2))
-	warped = four_point_transform(gray, puzzlecnt.reshape(4, 2))
+    warped = four_point_transform(gray, puzzlecnt.reshape(4, 2))
+    puzzle = four_point_transform(image, puzzlecnt.reshape(4, 2))
 
     if debug:
         cv2.imshow("Puzzle Transform", puzzle)
         cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     return puzzle, warped
 
@@ -121,6 +125,7 @@ def extract_digits(cell, debug=True):
     if debug:
         cv2.imshow("Cell Thresh", thresh)
         cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     # find contours in the thresholded cells
     cnts = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -135,7 +140,6 @@ def extract_digits(cell, debug=True):
     c = max(cnts, key=cv2.contourArea)
     mask = np.zeros(thresh.shape, dtype='uint8')
     cv2.drawContours(mask, [c], -1, 255, -1)
-    cnts = grab_contours(cnts)
 
     # if no contours were found then this is an empty cell
     if len(cnts) == 0:
@@ -161,6 +165,7 @@ def extract_digits(cell, debug=True):
     if debug:
         cv2.imshow('Digit', digit)
         cv2.waitKey(0)
+        cv2.destroyAllWindows()
     
     return digit
     
