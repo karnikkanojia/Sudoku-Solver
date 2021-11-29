@@ -30,9 +30,37 @@ dim = (width, height)
 image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
 
 # find the puzzle in the image and then
-(puzzleImage, warped[np.ndarray]) = find_puzzle(image, debug=args["debug"] > 0)
+(puzzleImage, warped) = find_puzzle(image, debug=args["debug"] > 0)
 
 # initialize the board
 board = np.zeros((9, 9), dtype='int')
 
-step_x = warped.shape()
+step_x = warped.shape[1]//9
+step_y = warped.shape[0]//9
+
+# storing cell locations
+celllocs = [] 
+for y in range(0, 9):
+    row = []
+    for x in range(0, 9):
+        startx=x*step_x
+        starty=y*step_y
+        endx=(x+1)*step_x
+        endy=(y+1)*step_y
+
+        row.append((startx, starty, endx, endy))
+        cell = warped[starty:endy, startx:endx]
+        digit = extract_digits(cell, debug=args['debug'])
+
+        if digit is not None:
+            roi = cv2.resize(digit, (28, 28))
+            roi = roi.astype("float")/255.
+            roi = img_to_array(roi)
+            roi = np.expand_dims(roi, axis=0)
+            pred = model.predict(roi).argmax(axis=1)[0]
+            board[y, x] = pred
+    celllocs.append(row)
+
+print("[INFO] OCR'd Sudoku board:")
+puzzle = Board.Board(grid=board)
+print(puzzle)
