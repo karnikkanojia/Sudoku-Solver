@@ -129,6 +129,8 @@ dmypy.json
 .pyre/
 
 # Data Files
+Digits/
+.vscode/
 archive.zip
 sudoku.csv
 Img/
