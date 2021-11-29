@@ -134,6 +134,7 @@ Digits/
 archive.zip
 sudoku.csv
 Img/
+samples/
 
 # Junk Files
 .DS_Store
