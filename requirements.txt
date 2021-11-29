@@ -1,6 +1,5 @@
 numpy
 pandas
-seaborn
 tensorflow
 opencv-python
 scikit-learn

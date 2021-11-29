@@ -1,7 +1,7 @@
 from typing import Union
 import numpy as np
 from numpy import array
-
+import numpy
 
 class Board:
     
