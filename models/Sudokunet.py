@@ -7,16 +7,21 @@ class SudokuNet:
     def build( height, width, depth, classes):
         model = Sequential()
         input_shape = (height, width, depth)
-        model.add(Conv2D(60, 5, input_shape=input_shape, padding='same', activation='relu'))
-        model.add(Conv2D(60, 5, padding='same', activation='relu'))
-        model.add(MaxPool2D(2))
-        model.add(Conv2D(30, 3, padding='same', activation='relu'))
-        model.add(Conv2D(30, 3, padding='same', activation='relu'))
-        model.add(MaxPool2D(2, strides=2))
-        model.add(Dropout(0.5))
-        model.add(Flatten())
-        model.add(Dense(500, activation='relu'))
-        model.add(Dropout(0.5))
-        model.add(Dense(10, activation='softmax'))
+        model.add(Conv2D(32, (5, 5), padding="same", input_shape=input_shape, activation='relu'))
+		model.add(MaxPool2D(pool_size=(2, 2)))
+		# second set of CONV => RELU => POOL layers
+		model.add(Conv2D(32, (3, 3), padding="same", activation='relu'))
+		model.add(MaxPool2D(pool_size=(2, 2)))
+		# first set of FC => RELU layers
+		model.add(Flatten())
+		model.add(Dense(64), activation='relu')
+		model.add(Dropout(0.5))
+		# second set of FC => RELU layers
+		model.add(Dense(64), activation='relu')
+		model.add(Dropout(0.5))
+		# softmax classifier
+		model.add(Dense(classes), activation='softmax')
+		# return the constructed network architecture
+		return model
 
         return model
