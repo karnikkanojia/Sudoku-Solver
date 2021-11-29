@@ -5,13 +5,14 @@ from sudoku import Board, Solver
 import numpy as np
 import argparse
 import cv2
+import sys
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-m", "--model", required=True,
                 help="path to trained classifier")
 ap.add_argument("-i", "--image", required=True,
                 help="path to Sudoku puzzle image")
-ap.add_argument("-d", "--debug", default=True, type=bool,
+ap.add_argument("-d", "--debug", default=False, type=bool,
                 help="Display the image after every step of pipelining.")
 args = vars(ap.parse_args())
 
@@ -28,11 +29,14 @@ width = int(image.shape[1] * scale_percent / 100)
 height = int(image.shape[0] * scale_percent / 100)
 dim = (width, height)
 image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+print("[INFO] image loaded...")
 
 # find the puzzle in the image and then
-(puzzleImage, warped) = find_puzzle(image, debug=args["debug"] > 0)
+print("[INFO] finding puzzle...")
+(puzzleImage, warped) = find_puzzle(image, debug=args["debug"])
 
 # initialize the board
+
 board = np.zeros((9, 9), dtype='int')
 
 step_x = warped.shape[1]//9
@@ -53,11 +57,13 @@ for y in range(0, 9):
         digit = extract_digits(cell, debug=args['debug'])
 
         if digit is not None:
-            roi = cv2.resize(digit, (28, 28))
+            roi = cv2.resize(digit, (32, 32))
             roi = roi.astype("float")/255.
             roi = img_to_array(roi)
             roi = np.expand_dims(roi, axis=0)
-            pred = model.predict(roi).argmax(axis=1)[0]
+            pred = model.predict(roi).argmax(axis=1)
+            print(pred)
+            sys.exit()
             board[y, x] = pred
     celllocs.append(row)
 
