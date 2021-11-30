@@ -1,11 +1,11 @@
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
 from sudoku.puzzle import extract_digits, find_puzzle
-from sudoku import Board, Solver
+from sudoku.Board import Board
+from sudoku.Solver import Solver
 import numpy as np
 import argparse
 import cv2
-import sys
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-m", "--model", required=True,
@@ -18,7 +18,7 @@ args = vars(ap.parse_args())
 
 # load the digit classifier from disk
 print("[INFO] loading digit classifier...")
-model = load_model(args["model"])
+model = load_model(args['model'])
 print("[INFO] model loaded...")
 
 # load the input image from disk and resize it
@@ -57,16 +57,16 @@ for y in range(0, 9):
         digit = extract_digits(cell, debug=args['debug'])
 
         if digit is not None:
-            roi = cv2.resize(digit, (32, 32))
+            roi = cv2.resize(digit, (28, 28))
             roi = roi.astype("float")/255.
             roi = img_to_array(roi)
             roi = np.expand_dims(roi, axis=0)
             pred = model.predict(roi).argmax(axis=1)
-            print(pred)
-            sys.exit()
             board[y, x] = pred
     celllocs.append(row)
 
 print("[INFO] OCR'd Sudoku board:")
-puzzle = Board.Board(grid=board)
-print(puzzle)
+puzzle = Board(grid=board)
+solver = Solver(puzzle)
+if args['debug']:
+    print(puzzle)
