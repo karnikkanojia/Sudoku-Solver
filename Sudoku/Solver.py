@@ -3,7 +3,7 @@ from . import Board
 class Solver:
 
     def __init__(self, board: Board):
-        self._board = Board(board)
+        self._board = Board.Board(board)
         self.solve()
 
     def solve(self):
