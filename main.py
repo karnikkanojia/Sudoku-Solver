@@ -76,3 +76,20 @@ puzzle = Board(grid=board)
 solver = Solver(puzzle)
 if args['debug']:
     print(puzzle)
+
+for (cellrow, boardrow) in zip(celllocs, solver._board._board):
+
+    for (box, digit) in zip(cellrow, boardrow):
+        startx, starty, endx, endy = box
+
+        # compute coordinates where the text will be put on the image
+        textx = int((endx-startx)*0.33)
+        texty = int((endy-starty)*-0.2)
+        textx+=startx
+        texty+=endy
+        # draw result in the image using coordinates calculated above
+        cv2.putText(puzzleImage, str(digit), (textx, texty), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 255), 2)
+
+cv2.imshow("Sudoku Result", puzzleImage)
+cv2.waitKey(0)
+
